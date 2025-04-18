@@ -4,6 +4,7 @@ import { Home, Login, Register } from "./pages";
 import { MainLayout } from "./layouts";
 import EmailSent from "./pages/EmailSent";
 import VerifyEmail from "./pages/VerifyEmail";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 const App = () => {
   return (
@@ -13,9 +14,11 @@ const App = () => {
         <Route
           path="/"
           element={
-            <MainLayout>
-              <Home />
-            </MainLayout>
+            <ProtectedRoute>
+              <MainLayout>
+                <Home />
+              </MainLayout>
+            </ProtectedRoute>
           }
         />
 

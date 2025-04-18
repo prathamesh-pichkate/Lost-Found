@@ -98,13 +98,12 @@ export const verifyEmail = async (req, res) => {
   }
 };
 
-console.log("JWT_ACCESS_SECRET", process.env.JWT_ACCESS_SECRET);
-console.log("JWT_REFRESH_SECRET", process.env.JWT_REFRESH_SECRET);
 export const loginUser = async (req, res) => {
   console.log("Login request received");
 
   try {
     const { email, password } = req.body;
+    console.log("Login data:", { email, password });
 
     // 1. Find user
     const user = await User.findOne({ email });
@@ -163,6 +162,40 @@ export const loginUser = async (req, res) => {
     });
   } catch (err) {
     console.error("Login error:", err);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
+export const logoutUser = async (req, res) => {
+  console.log("Logout request received");
+  try {
+    const token = req.cookies.refreshToken;
+    console.log("Token from cookies:", token);
+
+    if (!token) {
+      return res.status(204).json({ message: "No token to clear" });
+    }
+
+    // 1. Find user with this refresh token
+    const user = await User.findOne({ refreshTokens: token });
+
+    if (user) {
+      // 2. Remove the refresh token from DB
+      user.refreshTokens = user.refreshTokens.filter((t) => t !== token);
+      await user.save();
+    }
+
+    // 3. Clear the cookie from browser
+    res.clearCookie("refreshToken", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "Strict",
+    });
+
+    // 4. Respond with success
+    return res.status(200).json({ message: "Logged out successfully" });
+  } catch (err) {
+    console.error("Logout error:", err);
     res.status(500).json({ message: "Server Error" });
   }
 };

@@ -1,16 +1,23 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { login } from "../assets/images";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  loginFailure,
+  loginStart,
+  loginSuccess,
+} from "../redux/auth/authSlice";
 
 const Login = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { loading, error } = useSelector((state) => state.auth);
 
   // State for form fields and error
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
-  const [error, setError] = useState("");
 
   // Handle input change
   const handleChange = (e) => {
@@ -24,24 +31,21 @@ const Login = () => {
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
-
+    dispatch(loginStart());
     try {
       const response = await fetch(`http://localhost:3000/api/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        credentials: "include", // important to include cookies (refreshToken)
+        credentials: "include",
         body: JSON.stringify(formData),
       });
 
-      console.log("Response:", response);
-      console.log("Form Data:", formData);
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.message || "Login failed");
+        dispatch(loginFailure(data.message || "Login failed"));
         return;
       }
 
@@ -51,6 +55,8 @@ const Login = () => {
       localStorage.setItem("user", JSON.stringify(data.user));
 
       // Redirect to dashboard or home
+
+      dispatch(loginSuccess(data.user));
       navigate("/");
     } catch (err) {
       console.error("Login error:", err);
@@ -123,8 +129,9 @@ const Login = () => {
             <button
               type="submit"
               className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition"
+              disabled={loading}
             >
-              Sign In
+              {loading ? "Logging in..." : "Login"}
             </button>
           </div>
         </form>

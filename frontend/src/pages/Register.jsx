@@ -1,22 +1,27 @@
 import React from "react";
 import { useForm } from "react-hook-form";
-// import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { signup } from "../assets/images";
-import EmailSent from "./EmailSent";
 import { useNavigate } from "react-router-dom";
+import {
+  registerStart,
+  registerSuccess,
+  registerFailure,
+} from "../redux/auth/authSlice";
 
 const Register = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { loading } = useSelector((state) => state.auth);
   const {
     register: formRegister,
     handleSubmit,
     formState: { errors },
   } = useForm();
 
-  // const dispatch = useDispatch(); // Connect to Redux store if needed
-
   const onSubmit = async (formData) => {
     try {
+      dispatch(registerStart());
       const response = await fetch(`http://localhost:3000/api/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -26,12 +31,13 @@ const Register = () => {
       const data = await response.json();
 
       if (response.ok && data.status) {
-        // Navigate to the email sent page
+        dispatch(registerSuccess());
         navigate(`/email-sent?email=${formData.email}`);
       } else {
         console.error("Registration failed:", data.message);
       }
     } catch (error) {
+      dispatch(registerFailure(error.message));
       console.error("Error during registration:", error.message);
     }
   };
@@ -200,7 +206,7 @@ const Register = () => {
               type="submit"
               className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition"
             >
-              Register
+              {loading ? "Registering..." : "Register"}
             </button>
           </div>
         </form>
