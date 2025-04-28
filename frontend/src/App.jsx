@@ -1,6 +1,6 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { Home, Login, Register } from "./pages";
+import { Home, Login, Register, ReportPage } from "./pages";
 import { MainLayout } from "./layouts";
 import EmailSent from "./pages/EmailSent";
 import VerifyEmail from "./pages/VerifyEmail";
@@ -41,6 +41,14 @@ const App = () => {
         />
         <Route path="/email-sent" element={<EmailSent />} />
         <Route path="/verify-email" element={<VerifyEmail />} />
+        <Route
+          path="/report"
+          element={
+            <MainLayout>
+              <ReportPage />
+            </MainLayout>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );

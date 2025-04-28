@@ -133,9 +133,12 @@ const Navbar = () => {
           {/* Auth Buttons */}
           <div className="mt-4 md:mt-0 space-x-2 lg:space-x-4 flex items-center">
             {!isLoginPage && !isRegisterPage && (
-              <button className="bg-blue-600 text-white text-sm px-2 py-1 lg:px-3 py-2 rounded-sm hover:bg-blue-700">
+              <Link
+                to="/report"
+                className="bg-blue-600 text-white text-sm px-2 py-1 lg:px-3 py-2 rounded-sm hover:bg-blue-700"
+              >
                 Report
-              </button>
+              </Link>
             )}
 
             {!currentUser && !isLoginPage && (
